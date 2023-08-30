@@ -1,0 +1,28 @@
+{
+  "name": "daily-diet-api",
+  "version": "1.0.0",
+  "description": "- [ ] Deve ser possível criar um usuário\r - [ ] Deve ser possível identificar o usuário entre as requisições\r - [ ] Deve ser possível registrar uma refeição feita, com as seguintes informações:",
+  "main": "index.js",
+  "scripts": {
+    "dev": "tsx watch src/server.ts",
+    "knex": "node --no-warnings --loader tsx ./node_modules/knex/bin/cli.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "@types/node": "^20.5.7",
+    "@typescript-eslint/eslint-plugin": "^6.5.0",
+    "@typescript-eslint/parser": "^6.5.0",
+    "eslint": "^8.48.0",
+    "tsx": "^3.12.7",
+    "typescript": "^5.2.2"
+  },
+  "dependencies": {
+    "fastify": "^4.22.0",
+    "knex": "^2.5.1",
+    "sqlite3": "^5.1.6"
+  }
+}
+

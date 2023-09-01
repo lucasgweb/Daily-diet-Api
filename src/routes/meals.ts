@@ -124,4 +124,44 @@ export async function mealsRoutes(app: FastifyInstance) {
       reply.status(200).send();
     }
   );
+
+  app.get(
+    '/summary',
+    {
+      preHandler: [checkUserIdExists],
+    },
+    async (request: FastifyRequest, reply: FastifyReply) => {
+      const userId = request.cookies.userId;
+
+      const meals = await knex('meals').where('user_id', userId).select();
+
+      const totalMealsRecorded = meals.length;
+      const mealsWithinDiet = meals.filter(
+        (meal) => meal.dietary_compliance == true
+      );
+
+      const totalMealsOutsideDiet = totalMealsRecorded - mealsWithinDiet.length;
+
+      let currentSequence = [];
+      let bestSequenceOfMealsWithinDiet: typeof meals = [];
+
+      for (const meal of meals) {
+        if (meal.dietary_compliance == true) {
+          currentSequence.push(meal);
+          if (currentSequence.length > bestSequenceOfMealsWithinDiet.length) {
+            bestSequenceOfMealsWithinDiet = [...currentSequence];
+          }
+        } else {
+          currentSequence = [];
+        }
+      }
+
+      reply.status(200).send({
+        totalMealsRecorded,
+        totalMealsWithinDiet: mealsWithinDiet.length,
+        totalMealsOutsideDiet,
+        bestSequenceOfMealsWithinDiet
+      });
+    }
+  );
 }

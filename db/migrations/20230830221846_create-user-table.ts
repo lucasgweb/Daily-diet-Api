@@ -2,15 +2,15 @@ import { Knex } from 'knex';
 
 
 export async function up(knex: Knex): Promise<void> {
-  knex.schema.createTable('users', (table) => {
-    table.uuid('id').primary();
+  await knex.schema.createTable('users', (table) => {
+    table.uuid('id').primary().defaultTo(knex.fn.uuid());
     table.string('name').notNullable();
-    table.string('email').notNullable();
+    table.string('email').notNullable().unique();
   });
 }
 
 
 export async function down(knex: Knex): Promise<void> {
-  knex.schema.dropTable('users');
+  await knex.schema.dropTable('users');
 }
 

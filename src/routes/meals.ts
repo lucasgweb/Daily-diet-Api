@@ -65,22 +65,63 @@ export async function mealsRoutes(app: FastifyInstance) {
           user_id: userId,
           id,
         })
-        .select().first();
+        .select()
+        .first();
 
       reply.status(200).send(meal);
     }
   );
 
-  app.delete('/:id', {preHandler: [checkUserIdExists]}, async (request: FastifyRequest, reply: FastifyReply) => {
-    const deleteMealParamsSchema = z.object({
-      id: z.string().uuid(),
-    });
-    const { id } = deleteMealParamsSchema.parse(request.params);
+  app.delete(
+    '/:id',
+    { preHandler: [checkUserIdExists] },
+    async (request: FastifyRequest, reply: FastifyReply) => {
+      const deleteMealParamsSchema = z.object({
+        id: z.string().uuid(),
+      });
+      const { id } = deleteMealParamsSchema.parse(request.params);
 
-    const { userId } = request.cookies;
+      const { userId } = request.cookies;
 
-    await knex('meals').where({id, user_id: userId}).delete();
+      await knex('meals').where({ id, user_id: userId }).delete();
 
-    reply.status(200).send();
-  });
+      reply.status(200).send();
+    }
+  );
+
+  app.put(
+    '/:id',
+    { preHandler: [checkUserIdExists] },
+    async (request: FastifyRequest, reply: FastifyReply) => {
+      const updateMealBodySchema = z.object({
+        name: z.string(),
+        description: z.string(),
+        dietaryCompliance: z.boolean(),
+      });
+
+      const updateMealParamSchema = z.object({
+        id: z.string().uuid(),
+      });
+
+      const { description, dietaryCompliance, name } =
+        updateMealBodySchema.parse(request.body);
+
+      const { id } = updateMealParamSchema.parse(request.params);
+
+      const { userId } = request.cookies;
+
+      await knex('meals')
+        .update({
+          name,
+          description,
+          dietary_compliance: dietaryCompliance,
+        })
+        .where({
+          id,
+          user_id: userId,
+        });
+
+      reply.status(200).send();
+    }
+  );
 }

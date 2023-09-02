@@ -62,7 +62,7 @@ describe('Meals routes', () => {
       .set('Cookie', cookies)
       .expect(200);
 
-    expect(response.body).toEqual(
+    expect(response.body.summary).toEqual(
       expect.objectContaining({
         totalMealsRecorded: expect.any(Number),
         totalMealsWithinDiet: expect.any(Number),

@@ -43,7 +43,7 @@ export async function mealsRoutes(app: FastifyInstance) {
 
       const meals = await knex('meals').where({userId}).select();
 
-      reply.status(200).send(meals);
+      reply.status(200).send({meals});
     }
   );
 
@@ -69,7 +69,7 @@ export async function mealsRoutes(app: FastifyInstance) {
         .select()
         .first();
 
-      reply.status(200).send(meal);
+      reply.status(200).send({meal});
     }
   );
 
@@ -159,10 +159,12 @@ export async function mealsRoutes(app: FastifyInstance) {
       }
 
       reply.status(200).send({
-        totalMealsRecorded,
-        totalMealsWithinDiet: mealsWithinDiet.length,
-        totalMealsOutsideDiet,
-        bestSequenceOfMealsWithinDiet
+        summary: {
+          totalMealsRecorded,
+          totalMealsWithinDiet: mealsWithinDiet.length,
+          totalMealsOutsideDiet,
+          bestSequenceOfMealsWithinDiet,
+        },
       });
     }
   );

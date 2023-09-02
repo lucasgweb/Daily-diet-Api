@@ -1,11 +1,18 @@
-import 'dotenv/config';
+import { config } from 'dotenv';
 import { z } from 'zod';
 
-const envSchema = z.object({
-  NODE_ENV: z.enum(['development', 'production','test']).default('development'),
-  PORT: z.coerce.number().default(3333),
-  DATABASE_URL: z.string()
-});
+if (process.env.NODE_ENV === 'test') {
+  config({
+    path: '.env.test'
+  });
+}
 
+const envSchema = z.object({
+  NODE_ENV: z
+    .enum(['development', 'production', 'test'])
+    .default('development'),
+  PORT: z.coerce.number().default(3333),
+  DATABASE_URL: z.string(),
+});
 
 export const env = envSchema.parse(process.env);

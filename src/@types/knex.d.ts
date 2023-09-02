@@ -12,9 +12,9 @@ declare module 'knex/types/tables' {
       id: string;
       name: string;
       description: string;
-      dietary_compliance: boolean;
-      created_at: string;
-      user_id: string;
+      isOnDiet: boolean;
+      createdAt: string;
+      userId: string;
     };
   }
 }

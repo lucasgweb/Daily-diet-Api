@@ -13,19 +13,20 @@ export async function mealsRoutes(app: FastifyInstance) {
       const createMealBodySchema = z.object({
         name: z.string(),
         description: z.string(),
-        dietaryCompliance: z.boolean(),
+        isOnDiet: z.boolean(),
       });
 
-      const { description, dietaryCompliance, name } =
-        createMealBodySchema.parse(request.body);
+      const { description, isOnDiet, name } = createMealBodySchema.parse(
+        request.body
+      );
 
       const userId = request.cookies.userId;
 
       await knex('meals').insert({
         name,
         description,
-        dietary_compliance: dietaryCompliance,
-        user_id: userId,
+        isOnDiet,
+        userId: userId,
       });
 
       reply.status(201).send();
@@ -40,7 +41,7 @@ export async function mealsRoutes(app: FastifyInstance) {
     async (request: FastifyRequest, reply: FastifyReply) => {
       const userId = request.cookies.userId;
 
-      const meals = await knex('meals').where('user_id', userId).select();
+      const meals = await knex('meals').where({userId}).select();
 
       reply.status(200).send(meals);
     }
@@ -62,7 +63,7 @@ export async function mealsRoutes(app: FastifyInstance) {
 
       const meal = await knex('meals')
         .where({
-          user_id: userId,
+          userId,
           id,
         })
         .select()
@@ -83,7 +84,7 @@ export async function mealsRoutes(app: FastifyInstance) {
 
       const { userId } = request.cookies;
 
-      await knex('meals').where({ id, user_id: userId }).delete();
+      await knex('meals').where({ id, userId }).delete();
 
       reply.status(200).send();
     }
@@ -96,15 +97,16 @@ export async function mealsRoutes(app: FastifyInstance) {
       const updateMealBodySchema = z.object({
         name: z.string(),
         description: z.string(),
-        dietaryCompliance: z.boolean(),
+        isOnDiet: z.boolean(),
       });
 
       const updateMealParamSchema = z.object({
         id: z.string().uuid(),
       });
 
-      const { description, dietaryCompliance, name } =
-        updateMealBodySchema.parse(request.body);
+      const { description, isOnDiet, name } = updateMealBodySchema.parse(
+        request.body
+      );
 
       const { id } = updateMealParamSchema.parse(request.params);
 
@@ -114,11 +116,11 @@ export async function mealsRoutes(app: FastifyInstance) {
         .update({
           name,
           description,
-          dietary_compliance: dietaryCompliance,
+          isOnDiet,
         })
         .where({
           id,
-          user_id: userId,
+          userId
         });
 
       reply.status(200).send();
@@ -133,11 +135,11 @@ export async function mealsRoutes(app: FastifyInstance) {
     async (request: FastifyRequest, reply: FastifyReply) => {
       const userId = request.cookies.userId;
 
-      const meals = await knex('meals').where('user_id', userId).select();
+      const meals = await knex('meals').where({userId}).select();
 
       const totalMealsRecorded = meals.length;
       const mealsWithinDiet = meals.filter(
-        (meal) => meal.dietary_compliance == true
+        (meal) => meal.isOnDiet == true
       );
 
       const totalMealsOutsideDiet = totalMealsRecorded - mealsWithinDiet.length;
@@ -146,7 +148,7 @@ export async function mealsRoutes(app: FastifyInstance) {
       let bestSequenceOfMealsWithinDiet: typeof meals = [];
 
       for (const meal of meals) {
-        if (meal.dietary_compliance == true) {
+        if (meal.isOnDiet == true) {
           currentSequence.push(meal);
           if (currentSequence.length > bestSequenceOfMealsWithinDiet.length) {
             bestSequenceOfMealsWithinDiet = [...currentSequence];
